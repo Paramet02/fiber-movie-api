@@ -1,0 +1,55 @@
+version: '3.8'
+
+# กำหนด NetWork ให้กับ Container
+networks:
+  golang_api:
+    name: golang_api
+    driver: bridge
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres-1
+    environment:
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data # การเก็บข้อมูล docker ไปยังโฟลเดอร์ data
+    ports:
+      - "5432:5432"
+    restart: unless-stopped
+    networks:
+      - golang_api  # เพิ่ม networks ที่นี่
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin-1
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${EMAILPGADMIN}
+      PGADMIN_DEFAULT_PASSWORD: ${PASSWORDPGADMIN}
+    volumes:
+      - ./data/pgadmin:/var/lib/pgadmin # การเก็บข้อมูล docker ไปยังโฟลเดอร์ data
+    ports:
+      - "5050:80"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - golang_api  # เพิ่ม networks ที่นี่
+
+  golang:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: golang
+    ports:
+      - "8000:8000"
+    depends_on:
+      - postgres
+    restart: always
+    networks:
+      - golang_api  # เพิ่ม networks ที่นี่
+
+volumes:
+  postgres_data:
