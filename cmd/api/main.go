@@ -27,13 +27,6 @@ type Application struct {
 
 
 func main() {
-	// load file env 
-	// err := godotenv.Load()
-	// if err != nil {
-	// 	log.Fatalf("Error loading .env file: %v", err)
-	// }
-	// Set application config
-	
 	var application Application
 
 	// Parse the command line arguments for JWT
